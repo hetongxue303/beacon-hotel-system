@@ -7,7 +7,7 @@ from sqlalchemy import BigInteger, Column, ForeignKey
 from models.base import Base
 
 
-class Role_Menu(Base):
+class RoleMenu(Base):
     """ 角色菜单表 """
     __table_args__ = ({"comment": "角色菜单表"})
 
