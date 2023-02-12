@@ -46,7 +46,6 @@ async def get(page: int, size: int, real_name: str = None, is_status: bool = Non
 async def add(data: UserOutDto):
     if db.query(User).filter(User.username == data.username).first():
         raise InsertException(code=201, message='当前账户已存在')
-    print(data)
     try:
         db.add(User(username=data.username, password=get_password_hash(data.password),
                     real_name=data.real_name, description=data.description, gender=data.gender))

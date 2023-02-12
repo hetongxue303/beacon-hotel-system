@@ -12,4 +12,4 @@ class Role(Base):
 
     is_status = Column(Enum('0', '1'), server_default='0', comment='状态')
 
-    description = Column(String(500), server_default='', comment='备注')
+    description = Column(String(500), server_default='无', comment='备注')
