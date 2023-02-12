@@ -3,7 +3,7 @@ from sqlalchemy import BigInteger, Column, ForeignKey
 from models.base import Base
 
 
-class UserRole(Base):
+class User_Role(Base):
     """ 用户角色表 """
     __table_args__ = ({"comment": "用户角色表"})
 

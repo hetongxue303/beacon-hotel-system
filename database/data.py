@@ -6,5 +6,13 @@ user_data = [
         'gender': '1',
         'is_admin': '1',
         'is_status': '1'
+    },
+    {
+        'username': 'test',
+        'password': '$2b$12$q0OSa5wwpo1xkUfRCx2DZuPqWt04CQ.CNR.lV6oGqnpVmww2055Py',
+        'real_name': '测试员工',
+        'gender': '2',
+        'is_admin': '0',
+        'is_status': '0'
     }
 ]

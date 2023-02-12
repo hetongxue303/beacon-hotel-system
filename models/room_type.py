@@ -2,7 +2,7 @@ from models.base import Base
 from sqlalchemy import Column, BigInteger, String
 
 
-class RoomType(Base):
+class Room_Type(Base):
     """ 房间类型表 """
     __table_args__ = ({"comment": "房间类型表"})
 
@@ -10,4 +10,4 @@ class RoomType(Base):
 
     room_type_name = Column(String(200), nullable=False, comment='房间类型')
 
-    description = Column(String(500), server_default='', comment='备注')
+    description = Column(String(500), server_default='无', comment='备注')

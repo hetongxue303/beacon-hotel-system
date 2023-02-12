@@ -21,7 +21,7 @@ def events_listen(app: FastAPI):
         应用程序启动之前执行
         :return: none
         """
-        init_db()  # 初始化数据库
+        # init_db()  # 初始化数据库
         cors_middleware(app)  # 配置跨域中间件
         http_middleware(app)  # 配置http中间件
         init_exception(app)  # 开启全局异常捕获
