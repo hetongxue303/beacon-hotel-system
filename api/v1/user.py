@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 from core.security import get_password_hash
 from database.mysql import get_db
-from exception.custom import InsertException, UpdateException, DeleteException
+from exception.custom import InsertException, UpdateException, DeleteException, QueryException
 from models import User
 from schemas.common import Page
 from schemas.result import Success
@@ -13,33 +13,36 @@ router = APIRouter()
 db: Session = next(get_db())
 
 
-@router.get('/list', response_model=Success[Page[list[UserDto]]], summary='获取员工(分页)')
+@router.get('/page/list', response_model=Success[Page[list[UserDto]]], summary='获取员工(分页)')
 async def get(page: int, size: int, real_name: str = None, is_status: bool = None):
-    if real_name and is_status is not None:
-        is_status = int(is_status)
-        total = db.query(User).filter(User.real_name.like('%{0}%'.format(real_name)),
-                                      User.is_status == is_status.__str__()).count()
-        record = db.query(User).filter(User.real_name.like('%{0}%'.format(real_name)),
-                                       User.is_status == is_status.__str__()).limit(size).offset(
-            (page - 1) * size).all()
-        return Success(data=Page(total=total, record=record), message='查询成功')
+    try:
+        if real_name and is_status is not None:
+            is_status = int(is_status)
+            total = db.query(User).filter(User.real_name.like('%{0}%'.format(real_name)),
+                                          User.is_status == is_status.__str__()).count()
+            record = db.query(User).filter(User.real_name.like('%{0}%'.format(real_name)),
+                                           User.is_status == is_status.__str__()).limit(size).offset(
+                (page - 1) * size).all()
+            return Success(data=Page(total=total, record=record), message='查询成功')
 
-    if real_name:
-        total = db.query(User).filter(User.real_name.like('%{0}%'.format(real_name))).count()
-        record = db.query(User).filter(User.real_name.like('%{0}%'.format(real_name))).limit(
-            size).offset((page - 1) * size).all()
-        return Success(data=Page(total=total, record=record), message='查询成功')
+        if real_name:
+            total = db.query(User).filter(User.real_name.like('%{0}%'.format(real_name))).count()
+            record = db.query(User).filter(User.real_name.like('%{0}%'.format(real_name))).limit(
+                size).offset((page - 1) * size).all()
+            return Success(data=Page(total=total, record=record), message='查询成功')
 
-    if is_status is not None:
-        is_status = int(is_status)
-        total = db.query(User).filter(User.is_status == is_status.__str__()).count()
-        record = db.query(User).filter(User.is_status == is_status.__str__()).limit(size).offset(
-            (page - 1) * size).all()
-        return Success(data=Page(total=total, record=record), message='查询成功')
+        if is_status is not None:
+            is_status = int(is_status)
+            total = db.query(User).filter(User.is_status == is_status.__str__()).count()
+            record = db.query(User).filter(User.is_status == is_status.__str__()).limit(size).offset(
+                (page - 1) * size).all()
+            return Success(data=Page(total=total, record=record), message='查询成功')
 
-    total = db.query(User).count()
-    record = db.query(User).limit(size).offset((page - 1) * size).all()
-    return Success(data=Page(total=total, record=record), message='查询成功')
+        total = db.query(User).count()
+        record = db.query(User).limit(size).offset((page - 1) * size).all()
+        return Success(data=Page(total=total, record=record), message='查询成功')
+    except:
+        QueryException(code=400, message='查询失败')
 
 
 @router.post('/add', response_model=Success, summary='添加用户')

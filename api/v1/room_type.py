@@ -2,7 +2,7 @@ from fastapi import APIRouter
 from sqlalchemy.orm import Session
 
 from database.mysql import get_db
-from exception.custom import InsertException, UpdateException, DeleteException
+from exception.custom import InsertException, UpdateException, DeleteException, QueryException
 from models import Room_Type
 from schemas.common import Page
 from schemas.result import Success
@@ -12,16 +12,28 @@ router = APIRouter()
 db: Session = next(get_db())
 
 
-@router.get('/list', response_model=Success[Page[list[RoomTypeDto]]], summary='获取类型(分页)')
+@router.get('/list', response_model=Success[list[RoomTypeDto]], summary='获取类型(所有)')
+async def get_all():
+    try:
+        return Success(data=db.query(Room_Type).all(), message='查询成功')
+    except:
+        QueryException(code=400, message='查询失败')
+
+
+@router.get('/page/list', response_model=Success[Page[list[RoomTypeDto]]], summary='获取类型(分页)')
 async def get(page: int, size: int, room_type_name: str = None):
-    if room_type_name:
-        total = db.query(Room_Type).filter(Room_Type.room_type_name.like('%{0}%'.format(room_type_name))).count()
-        record = db.query(Room_Type).filter(Room_Type.room_type_name.like('%{0}%'.format(room_type_name))).limit(
-            size).offset((page - 1) * size).all()
+    try:
+        if room_type_name:
+            total = db.query(Room_Type).filter(Room_Type.room_type_name.like('%{0}%'.format(room_type_name))).count()
+            record = db.query(Room_Type).filter(Room_Type.room_type_name.like('%{0}%'.format(room_type_name))).limit(
+                size).offset((page - 1) * size).all()
+            return Success(data=Page(total=total, record=record), message='查询成功')
+
+        total = db.query(Room_Type).count()
+        record = db.query(Room_Type).limit(size).offset((page - 1) * size).all()
         return Success(data=Page(total=total, record=record), message='查询成功')
-    total = db.query(Room_Type).count()
-    record = db.query(Room_Type).limit(size).offset((page - 1) * size).all()
-    return Success(data=Page(total=total, record=record), message='查询成功')
+    except:
+        QueryException(code=400, message='查询失败')
 
 
 @router.post('/add', response_model=Success, summary='添加类型')

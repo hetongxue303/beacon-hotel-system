@@ -2,7 +2,7 @@ from fastapi import APIRouter
 from sqlalchemy.orm import Session
 
 from database.mysql import get_db
-from exception.custom import InsertException, UpdateException, DeleteException
+from exception.custom import InsertException, UpdateException, DeleteException, QueryException
 from models import Role
 from schemas.common import Page
 from schemas.result import Success
@@ -12,33 +12,36 @@ router = APIRouter()
 db: Session = next(get_db())
 
 
-@router.get('/list', response_model=Success[Page[list[RoleDto]]], summary='获取角色(分页)')
+@router.get('/page/list', response_model=Success[Page[list[RoleDto]]], summary='获取角色(分页)')
 async def get(page: int, size: int, role_name: str = None, is_status: bool = None):
-    if role_name and is_status is not None:
-        is_status = int(is_status)
-        total = db.query(Role).filter(Role.role_name.like('%{0}%'.format(role_name)),
-                                      Role.is_status == is_status.__str__()).count()
-        record = db.query(Role).filter(Role.role_name.like('%{0}%'.format(role_name)),
-                                       Role.is_status == is_status.__str__()).limit(size).offset(
-            (page - 1) * size).all()
-        return Success(data=Page(total=total, record=record), message='查询成功')
+    try:
+        if role_name and is_status is not None:
+            is_status = int(is_status)
+            total = db.query(Role).filter(Role.role_name.like('%{0}%'.format(role_name)),
+                                          Role.is_status == is_status.__str__()).count()
+            record = db.query(Role).filter(Role.role_name.like('%{0}%'.format(role_name)),
+                                           Role.is_status == is_status.__str__()).limit(size).offset(
+                (page - 1) * size).all()
+            return Success(data=Page(total=total, record=record), message='查询成功')
 
-    if role_name:
-        total = db.query(Role).filter(Role.role_name.like('%{0}%'.format(role_name))).count()
-        record = db.query(Role).filter(Role.role_name.like('%{0}%'.format(role_name))).limit(
-            size).offset((page - 1) * size).all()
-        return Success(data=Page(total=total, record=record), message='查询成功')
+        if role_name:
+            total = db.query(Role).filter(Role.role_name.like('%{0}%'.format(role_name))).count()
+            record = db.query(Role).filter(Role.role_name.like('%{0}%'.format(role_name))).limit(
+                size).offset((page - 1) * size).all()
+            return Success(data=Page(total=total, record=record), message='查询成功')
 
-    if is_status is not None:
-        is_status = int(is_status)
-        total = db.query(Role).filter(Role.is_status == is_status.__str__()).count()
-        record = db.query(Role).filter(Role.is_status == is_status.__str__()).limit(size).offset(
-            (page - 1) * size).all()
-        return Success(data=Page(total=total, record=record), message='查询成功')
+        if is_status is not None:
+            is_status = int(is_status)
+            total = db.query(Role).filter(Role.is_status == is_status.__str__()).count()
+            record = db.query(Role).filter(Role.is_status == is_status.__str__()).limit(size).offset(
+                (page - 1) * size).all()
+            return Success(data=Page(total=total, record=record), message='查询成功')
 
-    total = db.query(Role).count()
-    record = db.query(Role).limit(size).offset((page - 1) * size).all()
-    return Success(data=Page(total=total, record=record), message='查询成功')
+        total = db.query(Role).count()
+        record = db.query(Role).limit(size).offset((page - 1) * size).all()
+        return Success(data=Page(total=total, record=record), message='查询成功')
+    except:
+        QueryException(code=400, message='查询失败')
 
 
 @router.post('/add', response_model=Success, summary='添加角色')
