@@ -13,8 +13,27 @@ db: Session = next(get_db())
 
 
 @router.get('/page/list', response_model=Success[Page[list[RoomDto]]], summary='获取客房(分页)')
-async def get(page: int, size: int, room_name: str = None, is_status: bool = None):
+async def get(page: int, size: int, room_type_id: int = None, room_name: str = None, is_status: bool = None):
     try:
+        if room_name and room_type_id is not None and is_status is not None:
+            is_status = int(is_status)
+            total = db.query(Room).filter(Room.room_name.like('%{0}%'.format(room_name)),
+                                          Room.room_type_id == room_type_id,
+                                          Room.is_status == is_status.__str__()).count()
+            record = db.query(Room).filter(Room.room_name.like('%{0}%'.format(room_name)),
+                                           Room.room_type_id == room_type_id,
+                                           Room.is_status == is_status.__str__()).limit(size).offset(
+                (page - 1) * size).all()
+            return Success(data=Page(total=total, record=record), message='查询成功')
+
+        if room_name and room_type_id is not None:
+            total = db.query(Room).filter(Room.room_name.like('%{0}%'.format(room_name)),
+                                          Room.room_type_id == room_type_id).count()
+            record = db.query(Room).filter(Room.room_name.like('%{0}%'.format(room_name)),
+                                           Room.room_type_id == room_type_id).limit(size).offset(
+                (page - 1) * size).all()
+            return Success(data=Page(total=total, record=record), message='查询成功')
+
         if room_name and is_status is not None:
             is_status = int(is_status)
             total = db.query(Room).filter(Room.room_name.like('%{0}%'.format(room_name)),
