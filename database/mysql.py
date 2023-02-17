@@ -77,4 +77,4 @@ def init_db():
     # 创建表结构
     create_db()
     # 初始化表数据
-    init_data()
+    # init_data()

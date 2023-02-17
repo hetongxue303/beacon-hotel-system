@@ -6,3 +6,5 @@ from models.role_menu import *
 from models.user_role import *
 from models.room_type import *
 from models.room import *
+from models.customer import *
+from models.order import *
