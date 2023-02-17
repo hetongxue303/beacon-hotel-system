@@ -49,6 +49,12 @@ async def get(page: int, size: int, room_type_id: int = None, room_name: str = N
                 size).offset((page - 1) * size).all()
             return Success(data=Page(total=total, record=record), message='查询成功')
 
+        if room_type_id is not None:
+            total = db.query(Room).filter(Room.room_type_id == room_type_id).count()
+            record = db.query(Room).filter(Room.room_type_id == room_type_id).limit(
+                size).offset((page - 1) * size).all()
+            return Success(data=Page(total=total, record=record), message='查询成功')
+
         if is_status is not None:
             is_status = int(is_status)
             total = db.query(Room).filter(Room.is_status == is_status.__str__()).count()
@@ -58,6 +64,37 @@ async def get(page: int, size: int, room_type_id: int = None, room_name: str = N
 
         total = db.query(Room).count()
         record = db.query(Room).limit(size).offset((page - 1) * size).all()
+        return Success(data=Page(total=total, record=record), message='查询成功')
+    except:
+        raise QueryException(code=400, message='查询失败')
+
+
+@router.get('/home/page/list', response_model=Success[Page[list[RoomDto]]], summary='获取客房(首页)')
+async def get(page: int, size: int, room_type_id: int = None, room_name: str = None):
+    try:
+
+        if room_name and room_type_id is not None:
+            total = db.query(Room).filter(Room.room_name.like('%{0}%'.format(room_name)),
+                                          Room.is_status == '1', Room.room_type_id == room_type_id).count()
+            record = db.query(Room).filter(Room.room_name.like('%{0}%'.format(room_name)),
+                                           Room.is_status == '1', Room.room_type_id == room_type_id).limit(size).offset(
+                (page - 1) * size).all()
+            return Success(data=Page(total=total, record=record), message='查询成功')
+
+        if room_name:
+            total = db.query(Room).filter(Room.room_name.like('%{0}%'.format(room_name)), Room.is_status == '1').count()
+            record = db.query(Room).filter(Room.room_name.like('%{0}%'.format(room_name)), Room.is_status == '1').limit(
+                size).offset((page - 1) * size).all()
+            return Success(data=Page(total=total, record=record), message='查询成功')
+
+        if room_type_id is not None:
+            total = db.query(Room).filter(Room.room_type_id == room_type_id, Room.is_status == '1').count()
+            record = db.query(Room).filter(Room.room_type_id == room_type_id, Room.is_status == '1').limit(
+                size).offset((page - 1) * size).all()
+            return Success(data=Page(total=total, record=record), message='查询成功')
+
+        total = db.query(Room).filter(Room.is_status == '1').count()
+        record = db.query(Room).filter(Room.is_status == '1').limit(size).offset((page - 1) * size).all()
         return Success(data=Page(total=total, record=record), message='查询成功')
     except:
         raise QueryException(code=400, message='查询失败')
