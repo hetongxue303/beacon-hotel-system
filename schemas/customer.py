@@ -4,6 +4,12 @@ from pydantic import BaseModel
 
 
 class CustomerDto(BaseModel):
+    customer_id: int = None
+    customer_name: str = None
+    customer_account: str = None
+    customer_password: str = None
+    is_status: bool = None
+    description: str = None
     create_time: datetime = None
     update_time: datetime = None
 
