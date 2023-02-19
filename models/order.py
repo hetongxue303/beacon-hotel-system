@@ -1,4 +1,4 @@
-from sqlalchemy import Column, BigInteger, String, ForeignKey, Enum
+from sqlalchemy import Column, BigInteger, String, ForeignKey, Enum, DateTime, func, Integer
 from sqlalchemy.orm import relationship
 
 from models import Base
@@ -18,7 +18,12 @@ class Order(Base):
     room_id = Column(BigInteger, ForeignKey('room.room_id'), nullable=False, comment='房间ID')
     room = relationship('Room', backref='room')
 
-    is_status = Column(Enum('0', '1'), nullable=False,
-                       comment='订单状态(0-> 已过期 1->已预约 2->已入住 3-> 已退房 4->待付款 5->待入住)')
+    is_status = Column(Enum('0', '1'), nullable=False, server_default='0', comment='订单状态(0-> 未处理 1->已处理)')
+
+    count_num = Column(Integer(), nullable=False, comment='入住人数')
+
+    start_date_time = Column(DateTime(timezone=True), nullable=False, comment='入住时间')
+
+    leave_date_time = Column(DateTime(timezone=True), nullable=False, comment='离开时间')
 
     description = Column(String(1000), server_default='无', comment='订单备注')

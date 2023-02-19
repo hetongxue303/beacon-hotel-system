@@ -14,6 +14,7 @@ class RoomDto(BaseModel):
     room_bed: int = None
     room_count: int = None
     is_status: bool = None
+    is_state: str = None
     room_detail: str = None
     create_time: datetime = None
     update_time: datetime = None

@@ -124,11 +124,23 @@ async def delete(id: int):
     return Success(message='删除成功')
 
 
-@router.put('/update/status', response_model=Success, summary='更新客房状态')
+@router.put('/update/status', response_model=Success, summary='更新是否开启客房')
 async def update_status(data: RoomDto):
     try:
         item = db.query(Room).filter(Room.room_id == data.room_id).first()
         item.is_status = '1' if data.is_status else '0'
+        db.commit()
+    except:
+        db.rollback()
+        raise UpdateException(code=400, message='更新失败')
+    return Success(message='更新成功')
+
+
+@router.put('/update/state', response_model=Success, summary='更新客房状态')
+async def update_status(data: RoomDto):
+    try:
+        item = db.query(Room).filter(Room.room_id == data.room_id).first()
+        item.is_state = data.is_state
         db.commit()
     except:
         db.rollback()
@@ -148,6 +160,7 @@ async def update(data: RoomDto):
         item.room_bed = data.room_bed
         item.room_type_id = data.room_type_id
         item.is_status = '1' if data.is_status else '0'
+        item.is_state = data.is_state
         db.commit()
     except:
         db.rollback()

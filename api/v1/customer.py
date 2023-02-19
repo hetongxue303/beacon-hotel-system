@@ -1,8 +1,11 @@
+import jsonpickle
+from aioredis import Redis
 from fastapi import APIRouter
 from sqlalchemy.orm import Session
 
 from core.security import verify_password, get_password_hash
 from database.mysql import get_db
+from database.redis import get_redis
 from exception.custom import InsertException, UpdateException, DeleteException, QueryException, UserPasswordException, \
     SecurityScopeException
 from models import Customer
@@ -15,8 +18,14 @@ db: Session = next(get_db())
 
 
 @router.get('/page/list', response_model=Success[Page[list[CustomerDto]]], summary='获取顾客(分页)')
-async def get(page: int, size: int):
+async def get(page: int, size: int, customer_name: str = None):
     try:
+        if customer_name:
+            total = db.query(Customer).filter(Customer.customer_name.like('%{0}%'.format(customer_name))).count()
+            record = db.query(Customer).filter(Customer.customer_name.like('%{0}%'.format(customer_name))).limit(
+                size).offset((page - 1) * size).all()
+            return Success(data=Page(total=total, record=record), message='查询成功')
+
         total = db.query(Customer).count()
         record = db.query(Customer).limit(size).offset((page - 1) * size).all()
         return Success(data=Page(total=total, record=record), message='查询成功')
@@ -39,13 +48,26 @@ async def insert(data: CustomerOutDto):
 
 @router.post('/login', response_model=Success[CustomerDto], summary='顾客登录')
 async def add(data: CustomerLoginDto):
-    print(data)
     customer = db.query(Customer).filter(Customer.customer_account == data.customer_account).first()
     if not verify_password(data.customer_password, customer.customer_password):
         raise UserPasswordException()
     if not bool(int(customer.is_status)):
         raise SecurityScopeException(code=403, message='当前用户未激活')
+    redis: Redis = await get_redis()
+    await redis.set(name='customer-info', value=jsonpickle.encode(customer))
     return Success(data=customer, message='登录成功')
+
+
+@router.get('/logout', response_model=Success, summary='顾客注销')
+async def logout():
+    try:
+        redis: Redis = await get_redis()
+        keys: list[str] = ['customer-info']
+        for key in keys:
+            await redis.delete(key)
+        return Success(message='注销成功')
+    except:
+        raise UpdateException(code=400, message='注销失败')
 
 
 @router.delete('/delete/{id}', response_model=Success, summary='删除顾客')

@@ -21,6 +21,9 @@ class Room(Base):
 
     room_count = Column(Integer, nullable=False, comment='客房人数')
 
-    is_status = Column(Enum('0', '1'), server_default='0', comment='客房状态')
+    is_status = Column(Enum('0', '1'), server_default='0', comment='是否开启')
+
+    is_state = Column(Enum('0', '1', '2', '3'), server_default='0',
+                      comment='客房状态(0->空闲 1->已预约 2->已入住 3->维修中)')
 
     room_detail = Column(String(1000), server_default='无', comment='客房详情')

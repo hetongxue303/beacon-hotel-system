@@ -13,7 +13,10 @@ class OrderDto(BaseModel):
     customer: CustomerDto = None
     room_id: int = None
     room: RoomDto = None
-    is_status: str = None
+    is_status: bool = None
+    count_num: int = None
+    start_date_time: datetime = None
+    leave_date_time: datetime = None
     description: str = None
     create_time: datetime = None
     update_time: datetime = None
