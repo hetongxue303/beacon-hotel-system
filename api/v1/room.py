@@ -3,8 +3,9 @@ from sqlalchemy.orm import Session
 
 from database.mysql import get_db
 from exception.custom import InsertException, DeleteException, UpdateException, QueryException
-from models import Room, Room_Type
+from models import Room, Room_Type, Order
 from schemas.common import Page
+from schemas.order import OrderDto
 from schemas.result import Success
 from schemas.room import RoomDto
 
@@ -137,10 +138,16 @@ async def update_status(data: RoomDto):
 
 
 @router.put('/update/state', response_model=Success, summary='更新客房状态')
-async def update_status(data: RoomDto):
+async def update_status(data: OrderDto):
     try:
-        item = db.query(Room).filter(Room.room_id == data.room_id).first()
-        item.is_state = data.is_state
+        room = db.query(Room).filter(Room.room_id == data.room_id).first()
+        order = db.query(Order).filter(Order.order_id == data.order_id).first()
+        if data.is_handler == '2':
+            room.is_state = data.is_handler
+        if data.is_handler == '3':
+            room.is_state = '0'
+        order.is_handler = data.is_handler
+        order.is_status = '1' if data.is_status else '0'
         db.commit()
     except:
         db.rollback()

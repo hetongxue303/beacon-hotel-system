@@ -20,6 +20,8 @@ class Order(Base):
 
     is_status = Column(Enum('0', '1'), nullable=False, server_default='0', comment='订单状态(0-> 未处理 1->已处理)')
 
+    is_handler = Column(Enum('1', '2', '3'), nullable=False, comment='订单状态(1->已预约 2->已入住 3->已退房)')
+
     count_num = Column(Integer(), nullable=False, comment='入住人数')
 
     start_date_time = Column(DateTime(timezone=True), nullable=False, comment='入住时间')

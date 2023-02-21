@@ -14,6 +14,7 @@ class OrderDto(BaseModel):
     room_id: int = None
     room: RoomDto = None
     is_status: bool = None
+    is_handler: str = None
     count_num: int = None
     start_date_time: datetime = None
     leave_date_time: datetime = None

@@ -21,27 +21,27 @@ db: Session = next(get_db())
 
 
 @router.get('/page/list', response_model=Success[Page[list[OrderDto]]], summary='获取订单(分页)')
-async def get(page: int, size: int, order_num: str = None, is_state: str = None):
+async def get(page: int, size: int, customer_id: int = None, order_num: str = None, is_handler: str = None,
+              is_status: bool = None):
     try:
-        if order_num and is_state:
-            rooms: list[Room] = db.query(Room).filter(Room.is_state == is_state).all()
-            room_ids: list[int] = []
-            for item in rooms:
-                room_ids.append(item.room_id)
+        if is_status is not None and customer_id is not None:
+            status = '1' if is_status else '0'
+            total = db.query(Order).filter(Order.is_status == status, Order.customer_id == customer_id).count()
+            record = db.query(Order).filter(Order.is_status == status, Order.customer_id == customer_id).limit(
+                size).offset((page - 1) * size).all()
+            return Success(data=Page(total=total, record=record), message='查询成功')
+
+        if order_num and is_handler:
             total = db.query(Order).filter(Order.order_num.like('%{0}%'.format(order_num)),
-                                           Order.room_id.in_(room_ids)).count()
+                                           Order.is_handler == is_handler).count()
             record = db.query(Order).filter(Order.order_num.like('%{0}%'.format(order_num)),
-                                            Order.room_id.in_(room_ids)).limit(size).offset(
+                                            Order.is_handler == is_handler).limit(size).offset(
                 (page - 1) * size).all()
             return Success(data=Page(total=total, record=record), message='查询成功')
 
-        if is_state:
-            rooms: list[Room] = db.query(Room).filter(Room.is_state == is_state).all()
-            room_ids: list[int] = []
-            for item in rooms:
-                room_ids.append(item.room_id)
-            total = db.query(Order).filter(Order.room_id.in_(room_ids)).count()
-            record = db.query(Order).filter(Order.room_id.in_(room_ids)).limit(size).offset(
+        if is_handler:
+            total = db.query(Order).filter(Order.is_handler == is_handler).count()
+            record = db.query(Order).filter(Order.is_handler == is_handler).limit(size).offset(
                 (page - 1) * size).all()
             return Success(data=Page(total=total, record=record), message='查询成功')
 
@@ -58,7 +58,7 @@ async def get(page: int, size: int, order_num: str = None, is_state: str = None)
         QueryException(code=400, message='查询失败')
 
 
-@router.post('/add', response_model=Success, summary='添加预约')
+@router.post('/add', response_model=Success, summary='新增预约')
 async def add(data: OrderDto):
     try:
         redis: Redis = await get_redis()
@@ -66,6 +66,24 @@ async def add(data: OrderDto):
         room = db.query(Room).filter(Room.room_id == data.room_id).first()
         room.is_state = '1'
         db.add(Order(order_num=get_uuid(), customer_id=customer.customer_id, room_id=data.room_id,
+                     is_status='1' if data.is_status else '0', description=data.description, count_num=data.count_num,
+                     start_date_time=data.start_date_time + timedelta(hours=8),
+                     leave_date_time=data.leave_date_time + timedelta(hours=8)))
+        db.commit()
+    except:
+        db.rollback()
+        raise InsertException(code=400, message='新增失败')
+    return Success(message='新增成功')
+
+
+@router.post('/booking', response_model=Success, summary='添加预约')
+async def booking(data: OrderDto):
+    try:
+        redis: Redis = await get_redis()
+        customer: CustomerDto = jsonpickle.decode(await redis.get('customer-info'))
+        room = db.query(Room).filter(Room.room_id == data.room_id).first()
+        room.is_state = '1'
+        db.add(Order(order_num=get_uuid(), customer_id=customer.customer_id, room_id=data.room_id, is_handler='1',
                      is_status='1' if data.is_status else '0', description=data.description, count_num=data.count_num,
                      start_date_time=data.start_date_time + timedelta(hours=8),
                      leave_date_time=data.leave_date_time + timedelta(hours=8)))
