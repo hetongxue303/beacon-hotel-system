@@ -47,7 +47,7 @@ async def insert(data: CustomerOutDto):
 
 
 @router.post('/login', response_model=Success[CustomerDto], summary='顾客登录')
-async def add(data: CustomerLoginDto):
+async def login(data: CustomerLoginDto):
     customer = db.query(Customer).filter(Customer.customer_account == data.customer_account).first()
     if not verify_password(data.customer_password, customer.customer_password):
         raise UserPasswordException()
@@ -85,7 +85,7 @@ async def delete(id: int):
 async def update_status(data: CustomerDto):
     try:
         item = db.query(Customer).filter(Customer.customer_id == data.customer_id).first()
-        item.is_status = data.is_status
+        item.is_status = '1' if data.is_status else '0'
         db.commit()
     except:
         db.rollback()
@@ -97,7 +97,7 @@ async def update_status(data: CustomerDto):
 async def update(data: CustomerOutDto):
     try:
         item = db.query(Customer).filter(Customer.customer_id == data.customer_id).first()
-        item.customer_password = data.customer_password
+        item.customer_password = get_password_hash(data.customer_password)
         db.commit()
     except:
         db.rollback()
