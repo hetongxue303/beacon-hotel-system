@@ -44,16 +44,16 @@ room_data = [
 
 customer_data = [
     {
-        'customer_name': '周利华', 'customer_account': 'user1',
-        'customer_password': '$2b$12$q0OSa5wwpo1xkUfRCx2DZuPqWt04CQ.CNR.lV6oGqnpVmww2055Py'
+        'customer_name': '周利华', 'customer_account': 'user1', 'id_card': '500112200205015689',
+        'customer_password': '$2b$12$q0OSa5wwpo1xkUfRCx2DZuPqWt04CQ.CNR.lV6oGqnpVmww2055Py', 'telephone': '15447889586'
     },
     {
-        'customer_name': '刘忠鑫', 'customer_account': 'user2',
-        'customer_password': '$2b$12$q0OSa5wwpo1xkUfRCx2DZuPqWt04CQ.CNR.lV6oGqnpVmww2055Py'
+        'customer_name': '刘忠鑫', 'customer_account': 'user2', 'id_card': '500112200204215689',
+        'customer_password': '$2b$12$q0OSa5wwpo1xkUfRCx2DZuPqWt04CQ.CNR.lV6oGqnpVmww2055Py', 'telephone': '15447759686'
     },
     {
-        'customer_name': '李立峰', 'customer_account': 'user3',
-        'customer_password': '$12$7osHfLTNqdZS4Hnk2CVFpOWK9CeLF10EFV/oXHsRchjZ2cO6wKmUe'
+        'customer_name': '李立峰', 'customer_account': 'user3', 'id_card': '500112200101195899',
+        'customer_password': '$2b$12$q0OSa5wwpo1xkUfRCx2DZuPqWt04CQ.CNR.lV6oGqnpVmww2055Py', 'telephone': '15687889586'
     }
 ]
 

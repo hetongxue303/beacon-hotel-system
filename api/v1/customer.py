@@ -36,9 +36,9 @@ async def get(page: int, size: int, customer_name: str = None):
 @router.post('/insert', response_model=Success, summary='注册顾客')
 async def insert(data: CustomerOutDto):
     try:
-        print(data)
-        db.add(Customer(customer_name=data.customer_name, customer_account=data.customer_account,
-                        customer_password=get_password_hash(data.customer_password), description=data.description))
+        db.add(Customer(customer_name=data.customer_name, customer_account=data.customer_account, id_card=data.id_card,
+                        telephone=data.telephone, customer_password=get_password_hash(data.customer_password),
+                        description=data.description))
         db.commit()
     except:
         db.rollback()
@@ -49,7 +49,11 @@ async def insert(data: CustomerOutDto):
 @router.post('/login', response_model=Success[CustomerDto], summary='顾客登录')
 async def login(data: CustomerLoginDto):
     customer = db.query(Customer).filter(Customer.customer_account == data.customer_account).first()
-    if not verify_password(data.customer_password, customer.customer_password):
+    if not customer:
+        customer = db.query(Customer).filter(Customer.id_card == data.customer_account).first()
+    if not customer:
+        customer = db.query(Customer).filter(Customer.telephone == data.customer_account).first()
+    if not customer or not verify_password(data.customer_password, customer.customer_password):
         raise UserPasswordException()
     if not bool(int(customer.is_status)):
         raise SecurityScopeException(code=403, message='当前用户未激活')
@@ -112,6 +116,7 @@ async def update(data: CustomerDto):
         item.is_status = data.is_status
         item.customer_name = data.customer_name
         item.customer_account = data.customer_account
+        item.id_card = data.id_card
         item.description = data.description
         db.commit()
     except:

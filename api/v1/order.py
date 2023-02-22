@@ -97,7 +97,11 @@ async def booking(data: OrderDto):
 @router.delete('/delete/{id}', response_model=Success, summary='删除订单')
 async def delete(id: int):
     try:
-        db.delete(db.query(Order).filter(Order.order_id == id).first())
+        order = db.query(Order).filter(Order.order_id == id).first()
+        if order.is_handler == '1' or order.is_handler == '2':
+            room = db.query(Room).filter(Room.room_id == order.room_id).first()
+            room.is_state = '0'
+        db.delete(order)
         db.commit()
     except:
         db.rollback()

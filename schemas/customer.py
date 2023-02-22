@@ -7,6 +7,8 @@ class CustomerDto(BaseModel):
     customer_id: int = None
     customer_name: str = None
     customer_account: str = None
+    id_card: str = None
+    telephone: str = None
     is_status: bool = None
     description: str = None
     create_time: datetime = None

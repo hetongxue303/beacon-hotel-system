@@ -15,6 +15,10 @@ class Customer(Base):
 
     customer_password = Column(String(200), nullable=False, comment='顾客密码')
 
+    id_card = Column(String(18), nullable=False, comment='身份证号')
+
+    telephone = Column(String(11), nullable=False, comment='手机号')
+
     is_status = Column(Enum('0', '1'), server_default='1', comment='顾客状态')
 
     description = Column(String(500), server_default='无', comment='顾客备注')
