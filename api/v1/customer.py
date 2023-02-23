@@ -7,10 +7,10 @@ from core.security import verify_password, get_password_hash
 from database.mysql import get_db
 from database.redis import get_redis
 from exception.custom import InsertException, UpdateException, DeleteException, QueryException, UserPasswordException, \
-    SecurityScopeException
+    SecurityScopeException, UserNotFoundException
 from models import Customer
 from schemas.common import Page
-from schemas.customer import CustomerDto, CustomerOutDto, CustomerLoginDto
+from schemas.customer import CustomerDto, CustomerOutDto, CustomerLoginDto, CustomerUpdatePasswordDto
 from schemas.result import Success
 
 router = APIRouter()
@@ -44,6 +44,12 @@ async def insert(data: CustomerOutDto):
         db.rollback()
         raise InsertException(code=400, message='注册失败')
     return Success(message='注册成功')
+
+
+@router.get('/customer_account', response_model=Success[CustomerDto], summary='客户信息通过账户名字获取')
+async def login(customer_account: str):
+    return Success(data=db.query(Customer).filter(Customer.customer_account == customer_account).first(),
+                   message='查询成功')
 
 
 @router.post('/login', response_model=Success[CustomerDto], summary='顾客登录')
@@ -98,10 +104,14 @@ async def update_status(data: CustomerDto):
 
 
 @router.put('/update/password', response_model=Success, summary='更新顾客密码')
-async def update(data: CustomerOutDto):
+async def update(data: CustomerUpdatePasswordDto):
+    item = db.query(Customer).filter(Customer.customer_account == data.account).first()
+    if not item:
+        raise UserNotFoundException(message='用户不存在')
+    if not verify_password(data.old_pw, item.customer_password):
+        raise UserPasswordException(message='原密码有误')
     try:
-        item = db.query(Customer).filter(Customer.customer_id == data.customer_id).first()
-        item.customer_password = get_password_hash(data.customer_password)
+        item.customer_password = get_password_hash(data.new_pw)
         db.commit()
     except:
         db.rollback()
@@ -113,10 +123,9 @@ async def update(data: CustomerOutDto):
 async def update(data: CustomerDto):
     try:
         item = db.query(Customer).filter(Customer.customer_id == data.customer_id).first()
-        item.is_status = data.is_status
         item.customer_name = data.customer_name
-        item.customer_account = data.customer_account
         item.id_card = data.id_card
+        item.telephone = data.telephone
         item.description = data.description
         db.commit()
     except:

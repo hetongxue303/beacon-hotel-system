@@ -23,6 +23,16 @@ class CustomerOutDto(CustomerDto):
     customer_password: str = None
 
 
+class CustomerUpdatePasswordDto(BaseModel):
+    account: str = None
+    old_pw: str = None
+    new_pw: str = None
+
+    class Config:
+        orm_mode = True
+        arbitrary_types_allowed = True
+
+
 class CustomerLoginDto(BaseModel):
     customer_account: str = None
     customer_password: str = None
