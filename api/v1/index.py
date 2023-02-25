@@ -25,4 +25,4 @@ async def get(page: int, size: int):
                                  record=IndexDto(rooms=rooms, free_time=free_time, booking=booking, stay=stay,
                                                  maintenance=maintenance)), message='查询成功')
     except:
-        QueryException(code=400, message='查询失败')
+        raise QueryException(code=400, message='查询失败')

@@ -47,9 +47,12 @@ async def insert(data: CustomerOutDto):
 
 
 @router.get('/customer_account', response_model=Success[CustomerDto], summary='客户信息通过账户名字获取')
-async def login(customer_account: str):
-    return Success(data=db.query(Customer).filter(Customer.customer_account == customer_account).first(),
-                   message='查询成功')
+async def customer_by_account(customer_account: str):
+    try:
+        return Success(data=db.query(Customer).filter(Customer.customer_account == customer_account).first(),
+                       message='查询成功')
+    except:
+        raise QueryException(code=400, message='查询失败')
 
 
 @router.post('/login', response_model=Success[CustomerDto], summary='顾客登录')
@@ -85,10 +88,10 @@ async def delete(id: int):
     try:
         db.delete(db.query(Customer).filter(Customer.customer_id == id).first())
         db.commit()
+        return Success(message='删除成功')
     except:
         db.rollback()
         raise DeleteException(code=400, message='删除失败')
-    return Success(message='删除成功')
 
 
 @router.put('/update/status', response_model=Success, summary='更新顾客状态')
@@ -97,10 +100,10 @@ async def update_status(data: CustomerDto):
         item = db.query(Customer).filter(Customer.customer_id == data.customer_id).first()
         item.is_status = '1' if data.is_status else '0'
         db.commit()
+        return Success(message='更新成功')
     except:
         db.rollback()
         raise UpdateException(code=400, message='更新失败')
-    return Success(message='更新成功')
 
 
 @router.put('/update/password', response_model=Success, summary='更新顾客密码')
@@ -109,14 +112,14 @@ async def update(data: CustomerUpdatePasswordDto):
     if not item:
         raise UserNotFoundException(message='用户不存在')
     if not verify_password(data.old_pw, item.customer_password):
-        raise UserPasswordException(message='原密码有误')
+        raise UserPasswordException(message='原密码不正确')
     try:
         item.customer_password = get_password_hash(data.new_pw)
         db.commit()
+        return Success(message='更新成功')
     except:
         db.rollback()
         raise UpdateException(code=400, message='更新失败')
-    return Success(message='更新成功')
 
 
 @router.put('/update', response_model=Success, summary='更新顾客')
@@ -128,7 +131,7 @@ async def update(data: CustomerDto):
         item.telephone = data.telephone
         item.description = data.description
         db.commit()
+        return Success(message='更新成功')
     except:
         db.rollback()
         raise UpdateException(code=400, message='更新失败')
-    return Success(message='更新成功')

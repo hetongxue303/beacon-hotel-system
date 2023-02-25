@@ -66,13 +66,13 @@ def init_data():
     try:
         engine.execute(User.__table__.insert(), [user for user in user_data])
         engine.execute(Role.__table__.insert(), [role for role in role_data])
-        # engine.execute(Menu.__table__.insert(), [menu for menu in menu_data])
+        engine.execute(Menu.__table__.insert(), [menu for menu in menu_data])
         engine.execute(User_Role.__table__.insert(), [user_role for user_role in user_role_data])
         engine.execute(Role_Menu.__table__.insert(), [role_menu for role_menu in role_menu_data])
         engine.execute(Room_Type.__table__.insert(), [room_type for room_type in room_type_data])
         engine.execute(Room.__table__.insert(), [room for room in room_data])
         engine.execute(Customer.__table__.insert(), [customer for customer in customer_data])
-        # engine.execute(Order.__table__.insert(), [order for order in order_data])
+        engine.execute(Order.__table__.insert(), [order for order in order_data])
         logger.success('初始化表数据成功!!!')
     except Exception as e:
         logger.error(f'初始化表数据失败 -- 错误信息如下:\n{e}')

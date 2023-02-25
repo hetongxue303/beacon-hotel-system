@@ -55,7 +55,7 @@ async def get(page: int, size: int, customer_id: int = None, order_num: str = No
         record = db.query(Order).limit(size).offset((page - 1) * size).all()
         return Success(data=Page(total=total, record=record), message='查询成功')
     except:
-        QueryException(code=400, message='查询失败')
+        raise QueryException(code=400, message='查询失败')
 
 
 @router.post('/add', response_model=Success, summary='新增预约')
@@ -70,10 +70,10 @@ async def add(data: OrderDto):
                      start_date_time=data.start_date_time + timedelta(hours=8),
                      leave_date_time=data.leave_date_time + timedelta(hours=8)))
         db.commit()
+        return Success(message='新增成功')
     except:
         db.rollback()
         raise InsertException(code=400, message='新增失败')
-    return Success(message='新增成功')
 
 
 @router.post('/booking', response_model=Success, summary='添加预约')
@@ -88,10 +88,10 @@ async def booking(data: OrderDto):
                      start_date_time=data.start_date_time + timedelta(hours=8),
                      leave_date_time=data.leave_date_time + timedelta(hours=8)))
         db.commit()
+        return Success(message='预约成功')
     except:
         db.rollback()
         raise InsertException(code=400, message='预约失败')
-    return Success(message='预约成功')
 
 
 @router.delete('/delete/{id}', response_model=Success, summary='删除订单')
@@ -103,10 +103,10 @@ async def delete(id: int):
             room.is_state = '0'
         db.delete(order)
         db.commit()
+        return Success(message='删除成功')
     except:
         db.rollback()
         raise DeleteException(code=400, message='删除失败')
-    return Success(message='删除成功')
 
 
 @router.put('/update/status', response_model=Success, summary='更新订单状态')
@@ -115,10 +115,10 @@ async def update_status(data: OrderDto):
         item = db.query(Order).filter(Order.order_id == data.order_id).first()
         item.is_status = '1' if data.is_status else '0'
         db.commit()
+        return Success(message='更新成功')
     except:
         db.rollback()
         raise UpdateException(code=400, message='更新失败')
-    return Success(message='更新成功')
 
 
 @router.put('/update', response_model=Success, summary='更新订单')
@@ -133,7 +133,7 @@ async def update(data: OrderDto):
         item.start_date_time = data.start_date_time if data.start_date_time else item.start_date_time
         item.leave_date_time = data.leave_date_time if data.leave_date_time else item.leave_date_time
         db.commit()
+        return Success(message='更新成功')
     except:
         db.rollback()
         raise UpdateException(code=400, message='更新失败')
-    return Success(message='更新成功')

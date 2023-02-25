@@ -73,7 +73,6 @@ async def get(page: int, size: int, room_type_id: int = None, room_name: str = N
 @router.get('/home/page/list', response_model=Success[Page[list[RoomDto]]], summary='获取客房(首页)')
 async def get(page: int, size: int, room_type_id: int = None, room_name: str = None):
     try:
-
         if room_name and room_type_id is not None:
             total = db.query(Room).filter(Room.room_name.like('%{0}%'.format(room_name)),
                                           Room.is_status == '1', Room.room_type_id == room_type_id).count()
@@ -108,10 +107,10 @@ async def add(data: RoomDto):
                     room_price=data.room_price, room_bed=data.room_bed, room_detail=data.room_detail,
                     is_status='1' if data.is_status else '0'))
         db.commit()
+        return Success(message='添加成功')
     except:
         db.rollback()
         raise InsertException(code=400, message='添加失败')
-    return Success(message='添加成功')
 
 
 @router.delete('/delete/{id}', response_model=Success, summary='删除客房')
@@ -119,10 +118,10 @@ async def delete(id: int):
     try:
         db.delete(db.query(Room).filter(Room.room_id == id).first())
         db.commit()
+        return Success(message='删除成功')
     except:
         db.rollback()
         raise DeleteException(code=400, message='删除失败')
-    return Success(message='删除成功')
 
 
 @router.put('/update/status', response_model=Success, summary='更新是否开启客房')
@@ -131,10 +130,10 @@ async def update_status(data: RoomDto):
         item = db.query(Room).filter(Room.room_id == data.room_id).first()
         item.is_status = '1' if data.is_status else '0'
         db.commit()
+        return Success(message='更新成功')
     except:
         db.rollback()
         raise UpdateException(code=400, message='更新失败')
-    return Success(message='更新成功')
 
 
 @router.put('/update/state', response_model=Success, summary='更新客房状态')
@@ -149,10 +148,10 @@ async def update_status(data: OrderDto):
         order.is_handler = data.is_handler
         order.is_status = '1' if data.is_status else '0'
         db.commit()
+        return Success(message='更新成功')
     except:
         db.rollback()
         raise UpdateException(code=400, message='更新失败')
-    return Success(message='更新成功')
 
 
 @router.put('/update', response_model=Success, summary='更新客房')
@@ -169,7 +168,7 @@ async def update(data: RoomDto):
         item.is_status = '1' if data.is_status else '0'
         item.is_state = data.is_state
         db.commit()
+        return Success(message='更新成功')
     except:
         db.rollback()
         raise UpdateException(code=400, message='更新失败')
-    return Success(message='更新成功')

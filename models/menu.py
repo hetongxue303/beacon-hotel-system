@@ -13,7 +13,7 @@ class Menu(Base):
 
     menu_title = Column(String(200), nullable=False, comment='菜单标题')
 
-    menu_type = Column(Enum('1', '2', '3'), server_default='1', comment='菜单类型(1:目录 2:菜单 3:按钮)')
+    menu_type = Column(Enum('1', '2', '3'), server_default='1', comment='菜单类型(1:菜单项 2:菜单 3:按钮)')
 
     router_name = Column(String(200), comment='路由名称')
 
@@ -30,6 +30,8 @@ class Menu(Base):
     is_show = Column(Enum('0', '1'), server_default='1', comment='是否显示(1是 0否)')
 
     is_sub = Column(Enum('0', '1'), server_default='0', comment='是否有子菜单(1是 0否)')
+
+    is_status = Column(Enum('0', '1'), server_default='1', comment='状态')
 
     is_delete = Column(Enum('0', '1'), server_default='0', comment='是否删除(1是 0否)')
 

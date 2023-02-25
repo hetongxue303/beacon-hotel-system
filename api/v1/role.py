@@ -41,7 +41,7 @@ async def get(page: int, size: int, role_name: str = None, is_status: bool = Non
         record = db.query(Role).limit(size).offset((page - 1) * size).all()
         return Success(data=Page(total=total, record=record), message='查询成功')
     except:
-        QueryException(code=400, message='查询失败')
+        raise QueryException(code=400, message='查询失败')
 
 
 @router.post('/add', response_model=Success, summary='添加角色')
@@ -51,10 +51,10 @@ async def add(data: RoleDto):
     try:
         db.add(Role(role_name=data.role_name, description=data.description, is_status='1' if data.is_status else '0'))
         db.commit()
+        return Success(message='添加成功')
     except:
         db.rollback()
         raise InsertException(code=400, message='添加失败')
-    return Success(message='添加成功')
 
 
 @router.delete('/delete/{id}', response_model=Success, summary='删除角色')
@@ -62,10 +62,10 @@ async def delete(id: int):
     try:
         db.delete(db.query(Role).filter(Role.role_id == id).first())
         db.commit()
+        return Success(message='删除成功')
     except:
         db.rollback()
         raise DeleteException(code=400, message='删除失败')
-    return Success(message='删除成功')
 
 
 @router.put('/update', response_model=Success, summary='更新角色')
@@ -76,7 +76,7 @@ async def update(data: RoleDto):
         item.description = data.description
         item.is_status = '1' if data.is_status else '0'
         db.commit()
+        return Success(message='更新成功')
     except:
         db.rollback()
         raise UpdateException(code=400, message='更新失败')
-    return Success(message='更新成功')
