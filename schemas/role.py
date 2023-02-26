@@ -14,3 +14,12 @@ class RoleDto(BaseModel):
     class Config:
         orm_mode = True
         arbitrary_types_allowed = True
+
+
+class RoleInfoDto(BaseModel):
+    role: RoleDto = None
+    menu_ids: list[int] = None
+
+    class Config:
+        orm_mode = True
+        arbitrary_types_allowed = True

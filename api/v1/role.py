@@ -3,10 +3,10 @@ from sqlalchemy.orm import Session
 
 from database.mysql import get_db
 from exception.custom import InsertException, UpdateException, DeleteException, QueryException
-from models import Role
+from models import Role, Role_Menu
 from schemas.common import Page
 from schemas.result import Success
-from schemas.role import RoleDto
+from schemas.role import RoleDto, RoleInfoDto
 
 router = APIRouter()
 db: Session = next(get_db())
@@ -45,12 +45,18 @@ async def get(page: int, size: int, role_name: str = None, is_status: bool = Non
 
 
 @router.post('/add', response_model=Success, summary='添加角色')
-async def add(data: RoleDto):
-    if db.query(Role).filter(Role.role_name == data.role_name).first():
+async def add(data: RoleInfoDto):
+    role: RoleDto = data.role
+    menu_ids: list[int] = data.menu_ids
+    if db.query(Role).filter(Role.role_name == role.role_name).first():
         raise InsertException(code=201, message='当前角色已存在')
     try:
-        db.add(Role(role_name=data.role_name, description=data.description, is_status='1' if data.is_status else '0'))
+        info = Role(role_name=role.role_name, description=role.description, is_status='1' if role.is_status else '0')
+        db.add(info)
         db.commit()
+        for id in menu_ids:
+            db.add(Role_Menu(role_id=info.role_id, menu_id=id))
+            db.commit()
         return Success(message='添加成功')
     except:
         db.rollback()
@@ -60,6 +66,10 @@ async def add(data: RoleDto):
 @router.delete('/delete/{id}', response_model=Success, summary='删除角色')
 async def delete(id: int):
     try:
+        for item in db.query(Role_Menu).filter(Role_Menu.role_id == id).all():
+            db.delete(db.query(Role_Menu).filter(Role_Menu.menu_id == item.menu_id).first())
+            db.commit()
+            db.flush()
         db.delete(db.query(Role).filter(Role.role_id == id).first())
         db.commit()
         return Success(message='删除成功')
@@ -75,6 +85,34 @@ async def update(data: RoleDto):
         item.role_name = data.role_name
         item.description = data.description
         item.is_status = '1' if data.is_status else '0'
+        db.commit()
+        return Success(message='更新成功')
+    except:
+        db.rollback()
+        raise UpdateException(code=400, message='更新失败')
+
+
+@router.put('/update/info', response_model=Success, summary='更新角色信息')
+async def update_info(data: RoleInfoDto):
+    try:
+        role: RoleDto = data.role
+        ids = data.menu_ids
+        ids_all = [i.menu_id for i in db.query(Role_Menu).filter(Role_Menu.role_id == role.role_id).all()]
+        add_ids = [i for i in (ids + ids_all) if i not in ids_all]
+        delete_ids = [i for i in ids_all if i not in [x for x in ids if x in ids_all]]
+        for id in delete_ids:
+            print(1)
+            db.delete(db.query(Role_Menu).filter(Role_Menu.menu_id == id).filter())
+            db.commit()
+            db.flush()
+        for id in add_ids:
+            db.add(Role_Menu(role_id=role.role_id, menu_id=id))
+            db.commit()
+            db.flush()
+        item = db.query(Role).filter(Role.role_id == role.role_id).first()
+        item.role_name = role.role_name
+        item.description = role.description
+        item.is_status = '1' if role.is_status else '0'
         db.commit()
         return Success(message='更新成功')
     except:

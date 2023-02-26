@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 
 from database.mysql import get_db
 from exception.custom import UpdateException, DeleteException, InsertException, QueryException
-from models import Menu
+from models import Menu, User, User_Role, Role_Menu
 from schemas.common import Page
 from schemas.menu import MenuDto, MenuTreeDto
 from schemas.result import Success
@@ -17,6 +17,18 @@ db: Session = next(get_db())
 async def get_all():
     try:
         return Success(data=db.query(Menu).all(), message='查询成功')
+    except:
+        raise QueryException(code=400, message='查询失败')
+
+
+@router.get('/by_role_id/{role_id}', response_model=Success[list[MenuDto]], summary='获取菜单(所有)')
+async def get_all(role_id: int):
+    try:
+        role_menus = db.query(Role_Menu).filter(Role_Menu.role_id == role_id).all()
+        rms: list[int] = []
+        for rm in role_menus:
+            rms.append(rm.menu_id)
+        return Success(data=db.query(Menu).filter(Menu.menu_id.in_(rms)).all(), message='查询成功')
     except:
         raise QueryException(code=400, message='查询失败')
 
@@ -35,6 +47,21 @@ async def get(page: int, size: int):
 async def get_tree():
     try:
         return Success(data=filter_menu(data=db.query(Menu).all()), message='查询成功')
+    except:
+        raise QueryException(code=400, message='查询失败')
+
+
+@router.get('/tree/{username}', response_model=Success[list[MenuDto]], summary='获取我的菜单')
+async def get_my_tree(username: str):
+    try:
+        user = db.query(User).filter(User.username == username).first()
+        if user:
+            user_role = db.query(User_Role).filter(User_Role.user_id == user.user_id).first()
+            role_menus = db.query(Role_Menu).filter(Role_Menu.role_id == user_role.role_id).all()
+            rms: list[int] = []
+            for rm in role_menus:
+                rms.append(rm.menu_id)
+            return Success(data=db.query(Menu).filter(Menu.menu_id.in_(rms)).all(), message='查询成功')
     except:
         raise QueryException(code=400, message='查询失败')
 
@@ -87,6 +114,18 @@ async def update_status(data: MenuDto):
         raise UpdateException(code=400, message='更新失败')
 
 
+@router.put('/update/show', response_model=Success, summary='更新显示状态')
+async def update_status(data: MenuDto):
+    try:
+        item = db.query(Menu).filter(Menu.menu_id == data.menu_id).first()
+        item.is_show = '1' if data.is_show else '0'
+        db.commit()
+        return Success(message='更新成功')
+    except:
+        db.rollback()
+        raise UpdateException(code=400, message='更新失败')
+
+
 @router.put('/update', response_model=Success, summary='更新菜单')
 async def update(data: MenuDto):
     try:
@@ -100,7 +139,6 @@ async def update(data: MenuDto):
         item.sort = data.sort
         item.icon = data.icon
         item.permission = data.permission
-        item.is_show = '1' if data.is_show else '0'
         item.is_sub = '1' if data.is_sub else '0'
         item.description = data.description
         db.commit()
