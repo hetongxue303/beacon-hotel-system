@@ -1,12 +1,16 @@
 from pydantic import BaseModel
 from datetime import datetime
 
+from schemas.menu import MenuDto
+
 
 class LoginDto(BaseModel):
     username: str = None
     real_name: str = None
     is_admin: bool = None
     gender: str = None
+    is_status: bool = None
+    menus: list[MenuDto] = None
 
     class Config:
         orm_mode = True

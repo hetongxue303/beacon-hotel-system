@@ -13,6 +13,7 @@ class MenuDto(BaseModel):
     sort: int = None
     icon: str = None
     permission: str = None
+    sub_count: int = None
     is_show: bool = None
     is_sub: bool = None
     is_status: bool = None

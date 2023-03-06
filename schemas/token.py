@@ -9,7 +9,7 @@ class Token(BaseModel):
     message: str
     access_token: str
     expired_time: timedelta
-    user: LoginDto
+    login: LoginDto
 
     class Config:
         orm_mode = True

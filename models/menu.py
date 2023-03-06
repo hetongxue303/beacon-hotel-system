@@ -27,6 +27,8 @@ class Menu(Base):
 
     permission = Column(String(200), comment='权限标识')
 
+    sub_count = Column(Integer, nullable=False, server_default='0', comment='子菜单数')
+
     is_show = Column(Enum('0', '1'), server_default='1', comment='是否显示(1是 0否)')
 
     is_sub = Column(Enum('0', '1'), server_default='0', comment='是否有子菜单(1是 0否)')

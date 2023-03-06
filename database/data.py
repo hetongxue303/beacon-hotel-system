@@ -11,79 +11,79 @@ user_data = [
     {
         'username': 'test',
         'password': '$2b$12$q0OSa5wwpo1xkUfRCx2DZuPqWt04CQ.CNR.lV6oGqnpVmww2055Py',
-        'real_name': '测试员工', 'gender': '2', 'is_admin': '0', 'is_status': '0'
+        'real_name': '测试员工', 'gender': '2', 'is_admin': '0', 'is_status': '1'
     }
 ]
 
 role_data = [
     {'role_name': '管理员', 'is_status': '1', 'description': '拥有所有权限'},
-    {'role_name': '员工', 'is_status': '1', 'description': '员工权限'}
+    {'role_name': '酒店员工', 'is_status': '1', 'description': '员工权限'}
 ]
 
 menu_data = [
     {
-        'parent_id': 0, 'menu_title': '首页', 'menu_type': '1', 'router_name': 'dashboard',
-        'router_path': '/dashboard', 'component': '/dashboard/index.vue', 'sort': 1, 'icon': 'index',
+        'parent_id': 0, 'menu_title': '首页', 'menu_type': '1', 'router_name': 'dashboard', 'sub_count': 0,
+        'router_path': '/dashboard', 'component': 'dashboard/index.vue', 'sort': 1, 'icon': 'index',
         'permission': '*', 'is_show': '1', 'is_sub': '0', 'is_delete': '0', 'description': '无'
     },
     {
         'parent_id': 0, 'menu_title': '房间类型', 'menu_type': '1', 'router_name': 'type',
-        'router_path': '/type', 'component': '/type/index.vue', 'sort': 2, 'icon': 'index',
+        'router_path': '/type', 'component': 'type/index.vue', 'sort': 2, 'icon': 'index', 'sub_count': 0,
         'permission': 'type:list', 'is_show': '1', 'is_sub': '0', 'is_delete': '0', 'description': '无'
     },
     {
         'parent_id': 0, 'menu_title': '房间管理', 'menu_type': '1', 'router_name': 'room',
-        'router_path': '/room', 'component': '/room/index.vue', 'sort': 3, 'icon': 'index',
+        'router_path': '/room', 'component': 'room/index.vue', 'sort': 3, 'icon': 'index', 'sub_count': 0,
         'permission': 'room:list', 'is_show': '1', 'is_sub': '0', 'is_delete': '0', 'description': '无'
     },
     {
         'parent_id': 0, 'menu_title': '客户管理', 'menu_type': '1', 'router_name': 'customer',
-        'router_path': '/customer', 'component': '/customer/index.vue', 'sort': 4, 'icon': 'index',
+        'router_path': '/customer', 'component': 'customer/index.vue', 'sort': 4, 'icon': 'index', 'sub_count': 0,
         'permission': 'customer:list', 'is_show': '1', 'is_sub': '0', 'is_delete': '0', 'description': '无'
     },
     {
         'parent_id': 0, 'menu_title': '订单管理', 'menu_type': '1', 'router_name': 'order',
-        'router_path': '/order', 'component': '', 'sort': 5, 'icon': 'index',
+        'router_path': '/order', 'component': '', 'sort': 5, 'icon': 'index', 'sub_count': 3,
         'permission': '', 'is_show': '1', 'is_sub': '1', 'is_delete': '0', 'description': '无'
     },
     {
-        'parent_id': 5, 'menu_title': '预约订单', 'menu_type': '2', 'router_name': 'reservation',
-        'router_path': '/order/reservation', 'component': '/order/reservation/index.vue', 'sort': 6, 'icon': 'index',
+        'parent_id': 5, 'menu_title': '预约订单', 'menu_type': '2', 'router_name': 'reservation', 'sub_count': 0,
+        'router_path': '/order/reservation', 'component': 'order/reservation/index.vue', 'sort': 6, 'icon': 'index',
         'permission': 'order:reservation:list', 'is_show': '1', 'is_sub': '0', 'is_delete': '0', 'description': '无'
     },
     {
-        'parent_id': 5, 'menu_title': '入住订单', 'menu_type': '2', 'router_name': 'stay',
-        'router_path': '/order/stay', 'component': '/order/stay/index.vue', 'sort': 7, 'icon': 'index',
+        'parent_id': 5, 'menu_title': '入住订单', 'menu_type': '2', 'router_name': 'stay', 'sub_count': 0,
+        'router_path': '/order/stay', 'component': 'order/stay/index.vue', 'sort': 7, 'icon': 'index',
         'permission': 'order:stay:list', 'is_show': '1', 'is_sub': '0', 'is_delete': '0', 'description': '无'
     },
     {
-        'parent_id': 5, 'menu_title': '所有订单', 'menu_type': '2', 'router_name': 'all',
-        'router_path': '/order/all', 'component': '/order/all/index.vue', 'sort': 8, 'icon': 'index',
+        'parent_id': 5, 'menu_title': '所有订单', 'menu_type': '2', 'router_name': 'all', 'sub_count': 0,
+        'router_path': '/order/all', 'component': 'order/all/index.vue', 'sort': 8, 'icon': 'index',
         'permission': 'order:all:list', 'is_show': '1', 'is_sub': '0', 'is_delete': '0', 'description': '无'
     },
     {
         'parent_id': 0, 'menu_title': '系统管理', 'menu_type': '1', 'router_name': 'system',
-        'router_path': '/system', 'component': '', 'sort': 9, 'icon': 'system',
+        'router_path': '/system', 'component': '', 'sort': 9, 'icon': 'system', 'sub_count': 3,
         'permission': '', 'is_show': '1', 'is_sub': '1', 'is_delete': '0', 'description': '无'
     },
     {
-        'parent_id': 9, 'menu_title': '员工管理', 'menu_type': '2', 'router_name': 'user',
-        'router_path': '/system/user', 'component': '/system/user/index.vue', 'sort': 10, 'icon': 'system',
+        'parent_id': 9, 'menu_title': '员工管理', 'menu_type': '2', 'router_name': 'user', 'sub_count': 0,
+        'router_path': '/system/user', 'component': 'system/user/index.vue', 'sort': 10, 'icon': 'system',
         'permission': 'system:user:list', 'is_show': '1', 'is_sub': '0', 'is_delete': '0', 'description': '无'
     },
     {
-        'parent_id': 9, 'menu_title': '角色管理', 'menu_type': '2', 'router_name': 'role',
-        'router_path': '/system/role', 'component': '/system/role/index.vue', 'sort': 11, 'icon': 'role',
+        'parent_id': 9, 'menu_title': '角色管理', 'menu_type': '2', 'router_name': 'role', 'sub_count': 0,
+        'router_path': '/system/role', 'component': 'system/role/index.vue', 'sort': 11, 'icon': 'role',
         'permission': 'system:role:list', 'is_show': '1', 'is_sub': '0', 'is_delete': '0', 'description': '无'
     },
     {
-        'parent_id': 9, 'menu_title': '菜单管理', 'menu_type': '2', 'router_name': 'menu',
-        'router_path': '/system/menu', 'component': '/system/menu/index.vue', 'sort': 12, 'icon': 'menu',
+        'parent_id': 9, 'menu_title': '菜单管理', 'menu_type': '2', 'router_name': 'menu', 'sub_count': 0,
+        'router_path': '/system/menu', 'component': 'system/menu/index.vue', 'sort': 12, 'icon': 'menu',
         'permission': 'system:menu:list', 'is_show': '1', 'is_sub': '0', 'is_delete': '0', 'description': '无'
     },
     {
         'parent_id': 0, 'menu_title': '关于酒店', 'menu_type': '1', 'router_name': 'about',
-        'router_path': '/about', 'component': '/about/index.vue', 'sort': 13, 'icon': 'about',
+        'router_path': '/about', 'component': 'about/index.vue', 'sort': 13, 'icon': 'about', 'sub_count': 0,
         'permission': 'system:menu:list', 'is_show': '1', 'is_sub': '0', 'is_delete': '0', 'description': '无'
     }
 ]

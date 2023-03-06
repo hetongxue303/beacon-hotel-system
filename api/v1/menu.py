@@ -83,7 +83,7 @@ async def add(data: MenuDto):
                     router_name=data.router_name, router_path=data.router_path, component=data.component,
                     sort=data.sort, icon=data.icon, permission=data.permission, is_show='1' if data.is_show else '0',
                     is_sub='1' if data.is_sub else '0', is_status='1' if data.is_status else '0',
-                    description=data.description))
+                    description=data.description, sub_count=data.sub_count if data.sub_count != 0 else 0))
         db.commit()
         return Success(message='添加成功')
     except:
@@ -138,6 +138,7 @@ async def update(data: MenuDto):
         item.component = data.component,
         item.sort = data.sort
         item.icon = data.icon
+        item.sub_count = data.sub_count
         item.permission = data.permission
         item.is_sub = '1' if data.is_sub else '0'
         item.description = data.description

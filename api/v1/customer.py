@@ -11,6 +11,7 @@ from exception.custom import InsertException, UpdateException, DeleteException, 
 from models import Customer
 from schemas.common import Page
 from schemas.customer import CustomerDto, CustomerOutDto, CustomerLoginDto, CustomerUpdatePasswordDto
+from schemas.order import OrderDto
 from schemas.result import Success
 
 router = APIRouter()
@@ -53,6 +54,20 @@ async def customer_by_account(customer_account: str):
                        message='查询成功')
     except:
         raise QueryException(code=400, message='查询失败')
+
+
+@router.get('/id_card', response_model=Success[CustomerDto], summary='客户信息通过ID名字获取')
+async def customer_by_account(id_card: str):
+    try:
+        return Success(data=db.query(Customer).filter(Customer.id_card == id_card).first(),
+                       message='查询成功')
+    except:
+        raise QueryException(code=400, message='查询失败')
+
+
+@router.post('/stay', response_model=Success, summary='顾客入住')
+async def login(data: OrderDto):
+    print(data)
 
 
 @router.post('/login', response_model=Success[CustomerDto], summary='顾客登录')
