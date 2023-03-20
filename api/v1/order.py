@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from database.mysql import get_db
 from database.redis import get_redis
 from exception.custom import InsertException, UpdateException, DeleteException, QueryException
-from models import Customer, Room
+from models import Customer, Room, User
 from models.order import Order
 from schemas.common import Page
 from schemas.customer import CustomerDto
@@ -134,6 +134,7 @@ async def update(data: OrderDto):
         item.leave_date_time = data.leave_date_time if data.leave_date_time else item.leave_date_time
         db.commit()
         return Success(message='更新成功')
+
     except:
         db.rollback()
         raise UpdateException(code=400, message='更新失败')
